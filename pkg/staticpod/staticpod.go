@@ -51,6 +51,7 @@ type Args struct {
 	Image           name.Reference
 	Dirs            []string
 	Files           []string
+	Sockets         []string
 	CISMode         bool // CIS requires that the manifest be saved with 600 permissions
 	ExcludeFiles    []string
 	HealthExec      []string
@@ -278,6 +279,7 @@ func pod(args Args) (*v1.Pod, error) {
 		}
 	}
 
+	addSocket(p, args.Sockets)
 	addVolumes(p, args.Dirs, true)
 	addVolumes(p, args.Files, false)
 
@@ -285,6 +287,32 @@ func pod(args Args) (*v1.Pod, error) {
 	addExtraEnv(p, args.ExtraEnv)
 
 	return p, nil
+}
+
+func addSocket(p *v1.Pod, src []string) {
+	var (
+		prefix     = "sock"
+		sourceType = v1.HostPathSocket
+		readOnly   = false
+	)
+
+	for i, src := range src {
+		name := fmt.Sprintf("%s%d", prefix, i)
+		p.Spec.Volumes = append(p.Spec.Volumes, v1.Volume{
+			Name: name,
+			VolumeSource: v1.VolumeSource{
+				HostPath: &v1.HostPathVolumeSource{
+					Path: src,
+					Type: &sourceType,
+				},
+			},
+		})
+		p.Spec.Containers[0].VolumeMounts = append(p.Spec.Containers[0].VolumeMounts, v1.VolumeMount{
+			Name:      name,
+			ReadOnly:  readOnly,
+			MountPath: src,
+		})
+	}
 }
 
 func addVolumes(p *v1.Pod, src []string, dir bool) {
@@ -319,9 +347,7 @@ func addVolumes(p *v1.Pod, src []string, dir bool) {
 }
 
 func addExtraMounts(p *v1.Pod, extraMounts []string) {
-	var (
-		sourceType = v1.HostPathDirectoryOrCreate
-	)
+	sourceType := v1.HostPathDirectoryOrCreate
 
 	for i, rawMount := range extraMounts {
 		mount := strings.Split(rawMount, ":")
