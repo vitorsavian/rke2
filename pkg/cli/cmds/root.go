@@ -219,6 +219,7 @@ func validateCloudProviderName(clx *cli.Context, role CLIRole) {
 	cloudProviderDisables := map[string][]string{
 		"rancher-vsphere": {"rancher-vsphere-cpi", "rancher-vsphere-csi"},
 		"harvester":       {"harvester-cloud-provider", "harvester-csi-driver"},
+		// "ovirt":           {"ovirt-cloud-provider", "rke2-ovirt-csi-driver"},
 	}
 
 	for providerName, disables := range cloudProviderDisables {

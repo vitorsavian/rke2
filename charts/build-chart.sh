@@ -24,6 +24,13 @@ if [ "$CHART_VERSION" == "0.0.0" ]; then
   exit
 fi
 
+if [ -n "${CHART_PRIME:-}" ] && [ "${CHART_PRIME}" == "true" ]; then
+  if [ -z "${PRIME_REGISTRY:-}" ]; then
+    echo "This chart is marked as prime, Skipping."
+    exit 0
+  fi
+fi
+
 curl -fsSL "${CHART_URL}" | pigz -dc > "${CHART_TMP}"
 
 # Extract out Chart.yaml, inject a version requirement and bundle-id annotation, and delete/replace the one in the original tarball

@@ -8,6 +8,7 @@ source ./scripts/version.sh
 DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-1} docker image build \
     --build-arg TAG=${VERSION} \
     --build-arg KUBERNETES_VERSION=${KUBERNETES_VERSION} \
+    --build-arg PRIME_REGISTRY=${PRIME_REGISTRY:-} \
     --build-arg MAJOR=${VERSION_MAJOR} \
     --build-arg MINOR=${VERSION_MINOR} \
     --build-arg BUILDARCH=${GOARCH} \

@@ -136,6 +136,7 @@ VOLUME /var/lib/rancher/k3s
 
 FROM base AS charts
 ARG CHART_REPO="https://rke2-charts.rancher.io"
+ARG PRIME_REGISTRY=""
 ARG KUBERNETES_VERSION=""
 ARG CACHEBUST="cachebust"
 COPY charts/ /charts/
